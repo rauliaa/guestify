@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,9 +8,12 @@ class Tamu extends Model
 {
     use HasFactory;
 
-    protected $table = 'tamus'; // Nama tabel di database
+    protected $table = 'tamus'; // Nama tabel yang benar
 
-    protected $primaryKey = 'id_tamu'; // Primary key
+    protected $primaryKey = 'id_tamu'; // Set primary key sebagai 'id_tamu'
+
+    public $incrementing = true; // Mengingat id_tamu adalah auto-increment
+    protected $keyType = 'int'; // Primary key adalah integer
 
     protected $fillable = [
         'nama_tamu',

@@ -3,66 +3,85 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Tamu;
+use Illuminate\Validation\Rule;
+
 
 class TamuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Menampilkan daftar tamu
     public function index()
     {
-        //
-        return view('tamu.index');
+        $tamus = Tamu::all();
+        return view('tamu.index', compact('tamus'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Menampilkan form tambah tamu
     public function create()
     {
-        //
         return view('tamu.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Menyimpan data tamu baru
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_tamu' => 'required|string|max:255',
+            'email_tamu' => 'required|email|unique:tamus,email_tamu',
+            'nomor_telepon' => 'required|string|max:20',
+        ]);
+
+        Tamu::create([
+            'nama_tamu' => $request->nama_tamu,
+            'email_tamu' => $request->email_tamu,
+            'nomor_telepon' => $request->nomor_telepon,
+            'kode_unik' => $this->generateUniqueCode(),
+        ]);
+
+        return redirect()->route('tamu.index')->with('success', 'Tamu berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Menampilkan detail tamu
+    public function show(Tamu $tamu)
     {
-        //
-        return view('tamu.show');
+        return view('tamu.show', compact('tamu'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    // Menampilkan form edit tamu
+    public function edit(Tamu $tamu)
     {
-        //
-        return view('tamu.edit');
+        return view('tamu.edit', compact('tamu'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Mengupdate data tamu
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'nama_tamu' => 'required|max:255',
+            'email_tamu' => [
+                'required',
+                'email',
+                Rule::unique('tamus')->ignore($id, 'id_tamu'), // Menggunakan 'id_tamu' dan mengabaikan ID yang sedang diupdate
+            ],
+            'nomor_telepon' => 'required|max:255',
+        ]);
+    
+        $tamu = Tamu::findOrFail($id);
+        $tamu->update($validated);
+    
+        return redirect()->route('tamu.index')->with('success', 'Tamu berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // Menghapus tamu
+    public function destroy(Tamu $tamu)
     {
-        //
+        $tamu->delete();
+        return redirect()->route('tamu.index')->with('success', 'Tamu berhasil dihapus.');
+    }
+
+    // Generate kode unik
+    private function generateUniqueCode()
+    {
+        return strtoupper(substr(md5(uniqid()), 0, 6));
     }
 }
