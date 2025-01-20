@@ -19,6 +19,7 @@ class Tamu extends Model
         'nama_tamu',
         'email_tamu',
         'nomor_telepon',
+        'kode_unik',
     ];
 
     // Relasi dengan model Kehadiran

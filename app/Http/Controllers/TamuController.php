@@ -65,10 +65,10 @@ class TamuController extends Controller
             ],
             'nomor_telepon' => 'required|max:255',
         ]);
-    
+
         $tamu = Tamu::findOrFail($id);
         $tamu->update($validated);
-    
+
         return redirect()->route('tamu.index')->with('success', 'Tamu berhasil diperbarui.');
     }
 
@@ -81,7 +81,11 @@ class TamuController extends Controller
 
     // Generate kode unik
     private function generateUniqueCode()
-    {
-        return strtoupper(substr(md5(uniqid()), 0, 6));
-    }
+{
+    do {
+        $kode = strtoupper(substr(md5(uniqid()), 0, 6));
+    } while (Tamu::where('kode_unik', $kode)->exists());
+
+    return $kode;
+}
 }
