@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeder\TamuSeeder;
-use Database\Seeder\KehadiranSeeder;
+use Database\Seeders\TamuSeeder;
+use Database\Seeders\KehadiranSeeder;
 
 class DatabaseSeeder extends Seeder
 {

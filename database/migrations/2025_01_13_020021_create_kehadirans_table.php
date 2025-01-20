@@ -8,11 +8,11 @@ return new class extends Migration {
     {
         Schema::create('kehadirans', function (Blueprint $table) {
             $table->id('id_kehadiran');
-            $table->unsignedBigInteger('id_tamu'); // Pastikan unsignedBigInteger
-            $table->foreign('id_tamu')->references('id_tamu')->on('tamus')->onDelete('cascade');
+            $table->unsignedBigInteger('id_tamu');
+            $table->foreign('id_tamu')->references('id')->on('tamus')->onDelete('cascade');
             $table->string('acara');
             $table->dateTime('waktu_kehadiran');
-            $table->string('status_kehadiran');
+            $table->enum('status_kehadiran', ['hadir', 'tidak hadir', 'pending']);
             $table->timestamps();
         });
     }

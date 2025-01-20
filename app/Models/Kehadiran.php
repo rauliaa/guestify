@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Kehadiran extends Model
 {
@@ -20,9 +21,17 @@ class Kehadiran extends Model
         'status_kehadiran',
     ];
 
-    // Relasi dengan model Tamu
+    protected $casts = [
+        'waktu_kehadiran' => 'datetime:Y-m-d H:i:s',
+    ];
+
     public function tamu()
     {
         return $this->belongsTo(Tamu::class, 'id_tamu');
+    }
+
+    public function getWaktuKehadiranAttribute($value)
+    {
+        return Carbon::parse($value)->timezone('Asia/Jakarta')->format('d-m-Y H:i:s');
     }
 }

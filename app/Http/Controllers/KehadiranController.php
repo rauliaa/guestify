@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kehadiran;
+use App\Models\Tamu;
 use Illuminate\Http\Request;
+use App, Models\Users;
+use Carbon\Carbon;
 
 class KehadiranController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Tamu $tamu)
     {
         //
-        return view('kehadiran.index');
+        $tamu = Tamu::all();
+        $kehadiran = Kehadiran::with('tamu')->get();
+        return view('kehadiran.index', compact('tamu', 'kehadiran'));
     }
 
     /**
@@ -21,7 +27,9 @@ class KehadiranController extends Controller
     public function create()
     {
         //
-        return view('kehadiran.create');
+        $tamu = Tamu::all();
+        $kehadiran = Kehadiran::all();
+        return view('kehadiran.create', compact('tamu', 'kehadiran'));
     }
 
     /**
@@ -30,6 +38,20 @@ class KehadiranController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'id_tamu' => 'required|exists:tamus,id_tamu',
+            'acara' => 'required',
+            'status_kehadiran' => 'required',
+        ]);
+
+        Kehadiran::create([
+            'id_tamu' => $request->id_tamu,
+            'acara' => $request->acara,
+            'waktu_kehadiran' => Carbon::now(),
+            'status_kehadiran' => $request->status_kehadiran,
+        ]);
+
+        return redirect()->route('kehadiran.index')->with('success', 'Kehadiran berhasil dicatat.');
     }
 
     /**
@@ -38,7 +60,9 @@ class KehadiranController extends Controller
     public function show(string $id)
     {
         //
-        return view('kehadiran.show');
+        $tamu = Tamu::all();
+        $kehadiran = Kehadiran::with('tamu')->findOrFail($id);
+        return view('kehadiran.show', compact('tamu', 'kehadiran'));
     }
 
     /**
@@ -47,7 +71,9 @@ class KehadiranController extends Controller
     public function edit(string $id)
     {
         //
-        return view('kehadiran.edit');
+        $tamu = Tamu::all();
+        $kehadiran = Kehadiran::findOrFail($id);
+        return view('kehadiran.edit', compact('tamu', 'kehadiran'));
     }
 
     /**
@@ -56,13 +82,30 @@ class KehadiranController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $kehadiran = Kehadiran::findOrFail($id);
+        $request->validate([
+            'id_tamu' => 'required',
+            'acara' => 'required',
+            'status_kehadiran' => 'required',
+        ]);
+
+        $kehadiran->update([
+            'id_tamu' => $request->id_tamu,
+            'acara' => $request->acara,
+            'waktu_kehadiran' => Carbon::now('Asia/Jakarta'),
+            'status_kehadiran' => $request->status_kehadiran,
+        ]);
+
+        return redirect()->route('kehadiran.index')->with('success', 'Kehadiran berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Kehadiran $kehadiran)
     {
         //
+        $kehadiran->delete();
+        return redirect()->route('kehadiran.index')->with('success', 'Kehadiran berhasil dihapus.');
     }
 }
